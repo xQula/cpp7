@@ -15,10 +15,10 @@ MainWindow::MainWindow(QWidget *parent)
     layout = new QGridLayout();
     layout->addWidget(chart_view_);
     //нужно закоментировать строку ниже для открытия  в новом окне графика, но ничего не случается.
-    ui->wd_graphic->setLayout(layout);
-    chart_view_->show();
+    //ui->wd_graphic->setLayout(layout);
+    //chart_view_->show();
     // конект для принятия сигнала вывода графика
-    //connect(this, SIGNAL(MainWindow::sg_out_graphic()), this, SLOT(MainWindow::show_graphic()));
+    connect(this, &MainWindow::sg_out_graphic, this, &MainWindow::show_graphic);
 }
 
 MainWindow::~MainWindow()
@@ -181,8 +181,8 @@ void MainWindow::show_graphic()
 {
     chart_view_->chart()->createDefaultAxes();
     // для вывода в отдельное окно графка
-//    chart_view_->resize(400,400);
-//    chart_view_->show();
+    chart_view_->resize(400,400);
+    chart_view_->show();
 }
 
 void MainWindow::update_graphic(QVector<double> res)
@@ -198,7 +198,6 @@ void MainWindow::update_graphic(QVector<double> res)
     }
     graphic_class_->add_data_graph(x, res, 0);
     graphic_class_->update_graph(chart_);
-    show_graphic();
 }
 
 
@@ -264,7 +263,7 @@ void MainWindow::on_pb_start_clicked()
                                                 mins = FindMin(res);
                                                 DisplayResult(mins, maxs);
                                                 update_graphic(res);
-                                                //emit sg_out_graphic();
+                                                emit sg_out_graphic();
                                                 /*
                                                  * Тут необходимо реализовать код наполнения серии
                                                  * и вызов сигнала для отображения графика
