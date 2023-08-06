@@ -10,7 +10,7 @@ MyGraphic::MyGraphic( uint size)
 
 void MyGraphic::add_data_graph(const QVector<double> &x, const QVector<double> &y, uint num_graph)
 {
-    uint32_t max_size = x.size() > y.size() ? x.size() : y.size();
+    uint32_t max_size = x.size() > y.size() ? y.size() : x.size();
     for(uint32_t i = 0 ; i < max_size; ++i){
         ptr_graph_[num_graph]->append(x[i], y[i]);
     }

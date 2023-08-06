@@ -16,8 +16,6 @@
 #include <QChartView>
 #include "myGraphic.h"
 
-#include <QTimer>
-
 #define FD 1000.0 //частота дискретизации
 
 QT_BEGIN_NAMESPACE
@@ -41,19 +39,16 @@ public:
     QVector<double> FindMin(QVector<double> resultData);
     //Метод отображает результаты
     void DisplayResult(QVector<double> mins, QVector<double> maxs);
-    void show_graphic();
     void update_graphic(QVector<double> readData);
 
 signals:
-    void sg_start_graphic();
+   void sg_out_graphic();
 private slots:
     void on_pb_path_clicked();
     void on_pb_start_clicked();
 
     void on_pb_clearResult_clicked();
-    void sl_update_graphic(QVector<double> readData);
-    void get_copy_data();
-
+    void show_graphic();
 
 private:
     Ui::MainWindow *ui;
@@ -61,15 +56,13 @@ private:
     uint8_t numberSelectChannel = 0xEA;
 
     QVector<uint32_t> readData;
-    QVector<uint32_t> readData_copy;
     QVector<double> procesData;
+    QVector<double> procesData_copy;
     QVector<double> mins, maxs;
 
     MyGraphic *graphic_class_;
     QChart *chart_;
     QChartView * chart_view_;
     QGridLayout *layout;
-
-    QTimer *timer_;
 };
 #endif // MAINWINDOW_H

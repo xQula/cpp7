@@ -13,13 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
     chart_view_ = new QChartView(chart_);
     graphic_class_ = new MyGraphic(2);
     layout = new QGridLayout();
-    ui->wd_graphic->setLayout(layout);
     layout->addWidget(chart_view_);
+    //нужно закоментировать строку ниже для открытия  в новом окне графика, но ничего не случается.
+    ui->wd_graphic->setLayout(layout);
     chart_view_->show();
-    timer_ = new QTimer();
-    timer_->setInterval(1000);
-    connect(timer_, SIGNAL(QTimer::timeout), this, SLOT(MainWindow::get_copy_data));
-    connect(this, SIGNAL(sg_start_graphic()), this, SLOT(sl_update_graphic(readData)));
+    // конект для принятия сигнала вывода графика
+    //connect(this, SIGNAL(MainWindow::sg_out_graphic()), this, SLOT(MainWindow::show_graphic()));
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +28,6 @@ MainWindow::~MainWindow()
     delete chart_view_;
     delete layout;
     delete graphic_class_;
-    delete timer_;
 }
 
 
@@ -106,7 +104,6 @@ QVector<double> MainWindow::ProcessFile(const QVector<uint32_t> dataFile)
 {
     QVector<double> resultData;
     resultData.clear();
-
     foreach (int word, dataFile) {
         word &= 0x00FFFFFF;
         if(word > 0x800000){
@@ -117,7 +114,6 @@ QVector<double> MainWindow::ProcessFile(const QVector<uint32_t> dataFile)
         resultData.append(res);
     }
     ui->chB_procFileSucces->setChecked(true);
-
     return resultData;
 }
 
@@ -184,7 +180,9 @@ void MainWindow::DisplayResult(QVector<double> mins, QVector<double> maxs)
 void MainWindow::show_graphic()
 {
     chart_view_->chart()->createDefaultAxes();
-    chart_view_->show();
+    // для вывода в отдельное окно графка
+//    chart_view_->resize(400,400);
+//    chart_view_->show();
 }
 
 void MainWindow::update_graphic(QVector<double> res)
@@ -196,7 +194,7 @@ void MainWindow::update_graphic(QVector<double> res)
     x.reserve(1000);
     x.push_back(0);
     for(QVector<int>::Type i = 1; i < 1000; ++i){
-        x.push_back(0.1 + x[i-1]);
+        x.push_back(0.001 + x[i-1]);
     }
     graphic_class_->add_data_graph(x, res, 0);
     graphic_class_->update_graph(chart_);
@@ -266,6 +264,7 @@ void MainWindow::on_pb_start_clicked()
                                                 mins = FindMin(res);
                                                 DisplayResult(mins, maxs);
                                                 update_graphic(res);
+                                                //emit sg_out_graphic();
                                                 /*
                                                  * Тут необходимо реализовать код наполнения серии
                                                  * и вызов сигнала для отображения графика
@@ -288,25 +287,5 @@ void MainWindow::on_pb_clearResult_clicked()
     if(chart_->series().isEmpty() == false){
             graphic_class_->clear_graph(chart_);
     }
-}
-
-void MainWindow::sl_update_graphic(QVector<double> readData)
-{
-    if(chart_->series().isEmpty() == false){
-            graphic_class_->clear_graph(chart_);
-    }
-    QVector<double> x;
-    x[0] = 0;
-    for(QVector<int>::Type i = 1; i < 1000; ++i){
-        x[i] += 0.1 + x[i-1];
-    }
-    graphic_class_->add_data_graph(x, readData, 0);
-    graphic_class_->update_graph(chart_);
-    show_graphic();
-}
-
-void MainWindow::get_copy_data()
-{
-    readData_copy = readData;
 }
 
